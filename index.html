@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Cassino Royale - Slot Machine Premium</title>
+  <meta name="description" content="Jogo de slot machine profissional com temática de cassino">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary-color: #e5b80b;
+      --primary-dark: #c79807;
+      --secondary-color: #c00;
+      --bg-gradient-start: #0a0a0a;
+      --bg-gradient-end: #1a0e0e;
+      --reel-bg-start: #2a1a12;
+      --reel-bg-end: #1a100a;
+      --text-shadow: 0 0 8px var(--primary-color);
+      --box-shadow: 0 0 15px rgba(229, 184, 11, 0.5);
+      --transition-time: 0.3s;
+      --font-title: 'Playfair Display', serif;
+      --font-body: 'Montserrat', sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%), 
+                  url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?q=80&w=1000') center/cover no-repeat fixed;
+      color: #f0e6d2;
+      font-family: var(--font-body);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem 3rem;
+      overflow-x: hidden;
+      user-select: none;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      width: 100%;
+      position: relative;
+    }
+    h1 {
+      font-family: var(--font-title);
+      font-weight: 900;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: 0.1em;
+      color: var(--primary-color);
+      text-shadow: 2px 2px 4px #000, 0 0 10px var(--primary-color);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 2;
+    }
+    h1::after {
+      content: "";
+      display: block;
+      width: 150px;
+      height: 3px;
+      background: var(--primary-color);
+      margin: 0.5rem auto;
+      box-shadow: 0 0 8px var(--primary-color);
+    }
+    .subtitle {
+      color: rgba(240, 230, 210, 0.8);
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .login-container {
+      background: rgba(10, 5, 2, 0.9);
+      padding: 2.5rem 2rem;
+      border-radius: 10px;
+      border: 1px solid var(--primary-color);
+      box-shadow: var(--box-shadow), inset 0 0 30px rgba(0,0,0,0.5);
+      max-width: 500px;
+      width: 100%;
+      margin: 2rem auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+      animation: shine 3s infinite;
+    }
+    @keyframes shine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .login-title {
+      font-family: var(--font-title);
+      font-size: 1.8rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      text-shadow: 1px 1px 2px #000;
+    }
+    label.login-label {
+      font-size: 1rem;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      display: block;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+    .login-input {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--primary-color);
+      border-radius: 5px;
+      padding: 1rem;
+      color: #f0e6d2;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      width: 100%;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .login-input::placeholder {
+      color: rgba(229, 184, 11, 0.6);
+    }
+    .login-input:focus {
+      outline: none;
+      box-shadow: 0 0 10px var(--primary-color);
+      border-color: var(--primary-dark);
+    }
+    .login-button {
+      background: linear-gradient(to bottom, var(--primary-color), var(--primary-dark));
+      border: none;
+      border-radius: 5px;
+      padding: 1rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1a0e0e;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 0 #8a6d0b, 0 0 15px rgba(229, 184, 11, 0.6);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #8a6d0b, 0 0 20px rgba(229, 184, 11, 0.8);
+    }
+    .login-button:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: 0 2px 0 #8a6d0b, 0 0 15px rgba(229, 184, 11, 0.6);
+    }
+    .game-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 900px;
+    }
+    .player-info {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+      color: var(--primary-color);
+      font-weight: 600;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 0.8rem 1.5rem;
+      border-radius: 5px;
+      border: 1px solid var(--primary-color);
+    }
+    .player-name {
+      font-weight: 700;
+      color: #f0e6d2;
+    }
+    .attempts {
+      color: var(--secondary-color);
+      font-weight: 700;
+    }
+    .slot-machine {
+      width: 100%;
+      background: rgba(20, 10, 5, 0.9);
+      padding: 2rem;
+      border-radius: 10px;
+      border: 1px solid var(--primary-color);
+      box-shadow: var(--box-shadow), inset 0 0 50px rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    .reel-container {
+      position: relative;
+      width: clamp(100px, 22vw, 150px);
+      height: clamp(100px, 22vw, 150px);
+      border-radius: 5px;
+      background: linear-gradient(145deg, var(--reel-bg-start), var(--reel-bg-end));
+      box-shadow: 
+        inset 0 0 15px rgba(0,0,0,0.8),
+        0 0 10px rgba(229, 184, 11, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    .reel-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(229, 184, 11, 0.1) 0%,
+        rgba(229, 184, 11, 0) 20%,
+        rgba(229, 184, 11, 0) 80%,
+        rgba(229, 184, 11, 0.1) 100%
+      );
+      pointer-events: none;
+    }
+    .reel {
+      font-size: clamp(3rem, 8vw, 5rem);
+      color: var(--primary-color);
+      text-shadow: 
+        2px 2px 4px #000,
+        0 0 15px var(--primary-color);
+      font-weight: 900;
+      transition: transform 0.4s ease;
+      z-index: 2;
+    }
+    .reel.win {
+      animation: winGlow 0.7s ease-in-out 3 alternate;
+    }
+    @keyframes winGlow {
+      0% { text-shadow: 2px 2px 4px #000, 0 0 15px var(--primary-color); }
+      100% { text-shadow: 2px 2px 4px #000, 0 0 30px var(--primary-color), 0 0 45px #fff; }
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      margin-top: 1.5rem;
+      gap: 1.5rem;
+    }
+    button {
+      background: linear-gradient(to bottom, var(--primary-color), var(--primary-dark));
+      border: none;
+      border-radius: 5px;
+      padding: 1.2rem 4rem;
+      cursor: pointer;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a0e0e;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 0 #8a6d0b, 0 0 20px rgba(229, 184, 11, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      position: relative;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #8a6d0b, 0 0 25px rgba(229, 184, 11, 0.9);
+    }
+    button:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: 0 2px 0 #8a6d0b, 0 0 20px rgba(229, 184, 11, 0.7);
+    }
+    .message {
+      margin-top: 1rem;
+      font-size: 1.4rem;
+      color: var(--primary-color);
+      min-height: 1.6em;
+      text-shadow: 1px 1px 2px #000;
+      font-weight: 700;
+      text-align: center;
+      padding: 1rem 2rem;
+      border-radius: 5px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--primary-color);
+      max-width: 90%;
+    }
+    .message.jackpot {
+      color: #fff;
+      background: linear-gradient(to right, #e5b80b, #f8d84e, #e5b80b);
+      color: #1a0e0e;
+      font-weight: 900;
+      text-shadow: none;
+      animation: jackpotGlow 0.5s infinite alternate;
+    }
+    @keyframes jackpotGlow {
+      0% { box-shadow: 0 0 10px rgba(229, 184, 11, 0.7); }
+      100% { box-shadow: 0 0 30px rgba(229, 184, 11, 0.9); }
+    }
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 2rem;
+      gap: 1rem;
+    }
+    .stat-box {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--primary-color);
+      padding: 1rem;
+      border-radius: 5px;
+      text-align: center;
+      flex: 1;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    }
+    .stat-box div:first-child {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .stat-value {
+      color: #f0e6d2;
+      font-weight: 900;
+      font-size: 1.8rem;
+    }
+    .ranking-container {
+      display: none;
+      background: rgba(20, 10, 5, 0.95);
+      padding: 2.5rem 2rem;
+      border-radius: 10px;
+      border: 1px solid var(--primary-color);
+      box-shadow: var(--box-shadow), inset 0 0 50px rgba(0,0,0,0.7);
+      max-width: 600px;
+      width: 100%;
+      margin: 2rem auto;
+      text-align: center;
+    }
+    .ranking-title {
+      font-family: var(--font-title);
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      text-shadow: 1px 1px 2px #000;
+      position: relative;
+    }
+    .ranking-title::after {
+      content: "";
+      display: block;
+      width: 100px;
+      height: 2px;
+      background: var(--primary-color);
+      margin: 0.5rem auto;
+    }
+    .ranking-list {
+      list-style: none;
+      margin: 1.5rem 0;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 10px;
+      border-top: 1px solid rgba(229, 184, 11, 0.3);
+      border-bottom: 1px solid rgba(229, 184, 11, 0.3);
+    }
+    .ranking-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .ranking-list::-webkit-scrollbar-thumb {
+      background-color: var(--primary-color);
+      border-radius: 3px;
+    }
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem;
+      border-bottom: 1px solid rgba(229, 184, 11, 0.1);
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+    .ranking-item:hover {
+      background: rgba(229, 184, 11, 0.1);
+    }
+    .ranking-item:first-child {
+      color: var(--primary-color);
+      font-weight: 900;
+      font-size: 1.3rem;
+      background: rgba(229, 184, 11, 0.05);
+    }
+    .ranking-item:nth-child(2) {
+      color: #c0c0c0;
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+    .ranking-item:nth-child(3) {
+      color: #cd7f32;
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+    .ranking-player {
+      text-align: left;
+      flex: 1;
+    }
+    .ranking-score {
+      text-align: right;
+      font-weight: 900;
+      min-width: 60px;
+      color: var(--primary-color);
+    }
+    .view-ranking-btn {
+      margin-top: 1.5rem;
+      background: transparent;
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      box-shadow: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .view-ranking-btn:hover {
+      background: rgba(229, 184, 11, 0.1);
+      box-shadow: 0 0 15px rgba(229, 184, 11, 0.3);
+    }
+    .reset-ranking-btn {
+      background: transparent;
+      border: 1px solid var(--secondary-color);
+      color: var(--secondary-color);
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      box-shadow: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin: 1rem 0;
+    }
+    .reset-ranking-btn:hover {
+      background: rgba(200, 0, 0, 0.1);
+      box-shadow: 0 0 15px rgba(200, 0, 0, 0.3);
+    }
+    .feedback-btn {
+      margin-top: 1rem;
+      background: transparent;
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+      padding: 0.6rem 1.5rem;
+      font-size: 0.9rem;
+      box-shadow: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .feedback-btn:hover {
+      background: rgba(229, 184, 11, 0.1);
+      box-shadow: 0 0 10px rgba(229, 184, 11, 0.3);
+    }
+    .game-over {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(20, 10, 5, 0.95);
+      padding: 3rem 2rem;
+      border-radius: 10px;
+      border: 1px solid var(--primary-color);
+      box-shadow: var(--box-shadow), inset 0 0 50px rgba(0,0,0,0.7);
+      max-width: 600px;
+      width: 100%;
+      margin: 2rem auto;
+      text-align: center;
+      gap: 2rem;
+    }
+    .game-over-title {
+      font-family: var(--font-title);
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      font-weight: 900;
+      text-shadow: 1px 1px 2px #000;
+    }
+    .final-score {
+      font-size: 1.5rem;
+      color: #f0e6d2;
+      font-weight: 600;
+    }
+    .final-score span {
+      color: var(--primary-color);
+      font-weight: 900;
+      font-size: 2.5rem;
+    }
+    .final-message {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-shadow: 1px 1px 2px #000;
+      padding: 1rem 2rem;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 5px;
+      border: 1px solid var(--primary-color);
+    }
+    .final-message.jackpot {
+      animation: jackpotMessage 1s infinite alternate;
+    }
+    @keyframes jackpotMessage {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
+    }
+    .restart-btn {
+      background: linear-gradient(to bottom, var(--primary-color), var(--primary-dark));
+      border: none;
+      border-radius: 5px;
+      padding: 1.2rem 3rem;
+      cursor: pointer;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a0e0e;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 0 #8a6d0b, 0 0 20px rgba(229, 184, 11, 0.7);
+      text-transform: uppercase;
+    }
+    .restart-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #8a6d0b, 0 0 25px rgba(229, 184, 11, 0.9);
+    }
+    .chips-decoration {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      opacity: 0.8;
+      z-index: 1;
+    }
+    .chip-1 {
+      top: 10px;
+      left: 10px;
+      transform: rotate(-15deg);
+    }
+    .chip-2 {
+      bottom: 10px;
+      right: 10px;
+      transform: rotate(15deg);
+    }
+    @media (max-width: 768px) {
+      .slot-machine {
+        padding: 1.5rem;
+        gap: 1rem;
+      }
+      .reel-container {
+        width: clamp(80px, 25vw, 120px);
+        height: clamp(80px, 25vw, 120px);
+      }
+      .stats {
+        flex-direction: column;
+      }
+      button {
+        padding: 1rem 2rem;
+        font-size: 1.2rem;
+      }
+      .feedback-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main role="main" aria-label="Jogo de Cassino Royale Slot Machine" style="width: 100%; max-width: 900px;">
+    <header class="header">
+      <h1>Cassino Royale</h1>
+      <p class="subtitle">Slot Machine Premium</p>
+    </header>
+    
+    <!-- Tela de Login -->
+    <section class="login-container" id="loginContainer">
+      <img src="https://cdn-icons-png.flaticon.com/512/2691/2691993.png" class="chips-decoration chip-1" alt="Ficha de cassino">
+      <img src="https://cdn-icons-png.flaticon.com/512/2691/2691993.png" class="chips-decoration chip-2" alt="Ficha de cassino">
+      <div class="login-title">ENTRAR NO CASSINO</div>
+      <label class="login-label" for="playerNameInput">Seu Nome</label>
+      <input
+        type="text"
+        class="login-input"
+        id="playerNameInput"
+        placeholder="Digite seu nome"
+        maxlength="15"
+        aria-label="Nome do jogador"
+        autocomplete="off"
+      />
+      <button class="login-button" id="startGameBtn">ENTRAR</button>
+    </section>
+
+    <!-- Jogo Principal -->
+    <section class="game-container" id="gameContainer">
+      <div class="player-info">
+        <div>Jogador: <span class="player-name" id="currentPlayerName"></span></div>
+        <div>Créditos: <span class="attempts" id="remainingAttempts">0</span>/10</div>
+      </div>
+      <div class="slot-machine">
+        <div class="reel-container">
+          <div class="reel" id="reel1">$</div>
+        </div>
+        <div class="reel-container">
+          <div class="reel" id="reel2">$</div>
+        </div>
+        <div class="reel-container">
+          <div class="reel" id="reel3">$</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="spinBtn">GIRAR</button>
+        <div class="message" id="message"></div>
+        <div class="stats">
+          <div class="stat-box"> <div>Fichas</div> <div class="stat-value" id="currentScore">0</div> </div>
+          <div class="stat-box"> <div>Jackpots</div> <div class="stat-value" id="jackpotCount">0</div> </div>
+          <div class="stat-box"> <div>Vitórias</div> <div class="stat-value" id="winCount">0</div> </div>
+        </div>
+        <button class="view-ranking-btn" id="viewRankingBtn">Ranking</button>
+        <button class="feedback-btn" id="feedbackBtn">Deixar Feedback</button>
+      </div>
+    </section>
+
+    <!-- Tela de Ranking -->
+    <section class="ranking-container" id="rankingContainer">
+      <h2 class="ranking-title">TOP 10 JOGADORES</h2>
+      <ul class="ranking-list" id="rankingList">
+        <!-- Ranking será preenchido pelo JavaScript -->
+      </ul>
+      <button class="reset-ranking-btn" id="resetRankingBtn">Resetar Ranking</button>
+      <button class="view-ranking-btn" id="backFromRankingBtn">Voltar</button>
+    </section>
+
+    <!-- Tela de Game Over -->
+    <section class="game-over" id="gameOverContainer">
+      <h2 class="game-over-title">FIM DO JOGO</h2>
+      <div class="final-score">Suas fichas: <span id="finalScoreValue">0</span></div>
+      <div class="final-message" id="finalMessage"></div>
+      <button class="restart-btn" id="restartGameBtn">Jogar Novamente</button>
+      <button class="view-ranking-btn" id="viewRankingFinalBtn">Ver Ranking</button>
+    </section>
+  </main>
+
+  <audio id="spinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-spin-1930.mp3" preload="auto"></audio>
+  <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+  <audio id="jackpotSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-coin-tune-2017.mp3" preload="auto"></audio>
+
+  <script>
+    (() => {
+      // Elementos do DOM
+      const loginContainer = document.getElementById('loginContainer');
+      const gameContainer = document.getElementById('gameContainer');
+      const rankingContainer = document.getElementById('rankingContainer');
+      const gameOverContainer = document.getElementById('gameOverContainer');
+      
+      const playerNameInput = document.getElementById('playerNameInput');
+      const startGameBtn = document.getElementById('startGameBtn');
+      const currentPlayerName = document.getElementById('currentPlayerName');
+      const remainingAttempts = document.getElementById('remainingAttempts');
+      const reels = [
+        document.getElementById('reel1'),
+        document.getElementById('reel2'),
+        document.getElementById('reel3')
+      ];
+      const spinBtn = document.getElementById('spinBtn');
+      const messageDiv = document.getElementById('message');
+      const currentScore = document.getElementById('currentScore');
+      const jackpotCount = document.getElementById('jackpotCount');
+      const winCount = document.getElementById('winCount');
+      const viewRankingBtn = document.getElementById('viewRankingBtn');
+      const feedbackBtn = document.getElementById('feedbackBtn');
+      const backFromRankingBtn = document.getElementById('backFromRankingBtn');
+      const resetRankingBtn = document.getElementById('resetRankingBtn');
+      const rankingList = document.getElementById('rankingList');
+      const finalScoreValue = document.getElementById('finalScoreValue');
+      const finalMessage = document.getElementById('finalMessage');
+      const restartGameBtn = document.getElementById('restartGameBtn');
+      const viewRankingFinalBtn = document.getElementById('viewRankingFinalBtn');
+
+      // Sons do jogo
+      const spinSound = document.getElementById('spinSound');
+      const winSound = document.getElementById('winSound');
+      const jackpotSound = document.getElementById('jackpotSound');
+
+      // Configurações do jogo
+      const symbols = ['🍒', '🍋', '🍇', '💎', '7', '💰'];
+      const winMultipliers = {
+        '🍒': 2,
+        '🍋': 3,
+        '🍇': 5,
+        '💎': 10,
+        '💰': 15,
+        '7': 50 // Jackpot
+      };
+      const MAX_ATTEMPTS = 10;
+      const MAX_PLAYERS_IN_RANKING = 10;
+      const SPIN_ANIMATION_STEPS = 15;
+      const SPIN_INTERVAL_MS = 70;
+
+      // Estado do jogo
+      let gameState = {
+        playerName: '',
+        attemptsLeft: MAX_ATTEMPTS,
+        score: 0,
+        stats: {
+          jackpots: 0,
+          wins: 0
+        },
+        ranking: []
+      };
+
+      // Inicializa o jogo e configura eventos
+      function initGame() {
+        loadRanking();
+
+        startGameBtn.addEventListener('click', startGame);
+        spinBtn.addEventListener('click', spin);
+        viewRankingBtn.addEventListener('click', showRanking);
+        feedbackBtn.addEventListener('click', () => {
+          window.open('https://docs.google.com/forms/d/e/1FAIpQLSehmgjSrn8PR--pnoWAPs3kcsCpFqL358vO8EwNSUMcYZPBNQ/viewform?usp=header', '_blank');
+        });
+        backFromRankingBtn.addEventListener('click', hideRanking);
+        resetRankingBtn.addEventListener('click', resetRanking);
+        restartGameBtn.addEventListener('click', restartGame);
+        viewRankingFinalBtn.addEventListener('click', showRanking);
+
+        playerNameInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') startGame();
+        });
+      }
+      
+      // Carrega o ranking do localStorage
+      function loadRanking() {
+        const savedRanking = localStorage.getItem('casinoRanking');
+        if (savedRanking) {
+          gameState.ranking = JSON.parse(savedRanking);
+          updateRankingDisplay();
+        }
+      }
+
+      // Salva o ranking no localStorage
+      function saveRanking() {
+        localStorage.setItem('casinoRanking', JSON.stringify(gameState.ranking));
+      }
+
+      // Reseta o ranking completo
+      function resetRanking() {
+        if (confirm('Tem certeza que deseja resetar o ranking completo?\nTodos os dados serão perdidos permanentemente!')) {
+          gameState.ranking = [];
+          saveRanking();
+          updateRankingDisplay();
+          alert('Ranking resetado com sucesso!');
+        }
+      }
+
+      // Atualiza exibição do ranking
+      function updateRankingDisplay() {
+        rankingList.innerHTML = '';
+        if (gameState.ranking.length === 0) {
+          rankingList.innerHTML = '<li style="padding: 2rem; color: #666;">Nenhum jogador ainda</li>';
+          return;
+        }
+        
+        gameState.ranking.forEach((player, index) => {
+          const li = document.createElement('li');
+          li.className = 'ranking-item';
+          
+          const playerSpan = document.createElement('span');
+          playerSpan.className = 'ranking-player';
+          playerSpan.textContent = `${index + 1}. ${player.name}`;
+
+          const scoreSpan = document.createElement('span');
+          scoreSpan.className = 'ranking-score';
+          scoreSpan.textContent = player.score;
+
+          li.appendChild(playerSpan);
+          li.appendChild(scoreSpan);
+          rankingList.appendChild(li);
+        });
+      }
+
+      // Inicia o jogo após validação do nome
+      function startGame() {
+        const name = playerNameInput.value.trim();
+        if (name === '') {
+          messageDiv.textContent = 'Por favor, digite seu nome!';
+          messageDiv.style.display = 'block';
+          setTimeout(() => messageDiv.style.display = 'none', 2000);
+          playerNameInput.focus();
+          return;
+        }
+        
+        gameState.playerName = name;
+        gameState.attemptsLeft = MAX_ATTEMPTS;
+        gameState.score = 0;
+        gameState.stats = { jackpots: 0, wins: 0 };
+
+        currentPlayerName.textContent = name;
+        remainingAttempts.textContent = MAX_ATTEMPTS;
+        currentScore.textContent = '0';
+        jackpotCount.textContent = '0';
+        winCount.textContent = '0';
+        messageDiv.textContent = '';
+        messageDiv.className = 'message';
+
+        loginContainer.style.display = 'none';
+        rankingContainer.style.display = 'none';
+        gameOverContainer.style.display = 'none';
+        gameContainer.style.display = 'flex';
+        spinBtn.disabled = false;
+
+        // Tocar som de início
+        spinSound.currentTime = 0;
+        spinSound.play();
+      }
+
+      // Finaliza o jogo, atualiza ranking e mostra tela fim de jogo
+      function endGame() {
+        addToRanking(gameState.playerName, gameState.score);
+
+        finalScoreValue.textContent = gameState.score;
+        if (gameState.stats.jackpots > 0) {
+          finalMessage.textContent = '🎉 JACKPOT! VOCÊ É O REI DO CASSINO! 🎉';
+          finalMessage.classList.add('jackpot');
+        } else if (gameState.score >= 50) {
+          finalMessage.textContent = 'Ótimo resultado! Você nasceu com sorte!';
+        } else if (gameState.score >= 20) {
+          finalMessage.textContent = 'Boa tentativa! Quase um high roller!';
+        } else {
+          finalMessage.textContent = 'A sorte nem sempre está ao seu lado...';
+        }
+
+        gameContainer.style.display = 'none';
+        rankingContainer.style.display = 'none';
+        gameOverContainer.style.display = 'flex';
+      }
+
+      // Adiciona jogador e pontuação ao ranking (mantendo top 10)
+      function addToRanking(name, score) {
+        const lowerName = name.toLowerCase();
+        const existing = gameState.ranking.findIndex(p => p.name.toLowerCase() === lowerName);
+        
+        if (existing !== -1) {
+          if (score > gameState.ranking[existing].score) {
+            gameState.ranking[existing].score = score;
+          }
+        } else {
+          gameState.ranking.push({ name, score });
+        }
+        
+        gameState.ranking.sort((a, b) => b.score - a.score);
+        if (gameState.ranking.length > MAX_PLAYERS_IN_RANKING) {
+          gameState.ranking = gameState.ranking.slice(0, MAX_PLAYERS_IN_RANKING);
+        }
+        
+        saveRanking();
+        updateRankingDisplay();
+      }
+
+      function restartGame() {
+        gameOverContainer.style.display = 'none';
+        rankingContainer.style.display = 'none';
+        loginContainer.style.display = 'flex';
+        playerNameInput.value = gameState.playerName;
+        playerNameInput.focus();
+      }
+
+      function showRanking() {
+        loginContainer.style.display = 'none';
+        gameContainer.style.display = 'none';
+        gameOverContainer.style.display = 'none';
+        rankingContainer.style.display = 'block';
+        backFromRankingBtn.focus();
+      }
+
+      function hideRanking() {
+        rankingContainer.style.display = 'none';
+        if (gameState.attemptsLeft > 0) {
+          gameContainer.style.display = 'flex';
+          spinBtn.focus();
+        } else {
+          gameOverContainer.style.display = 'flex';
+          restartGameBtn.focus();
+        }
+      }
+
+      // Gira os rolos com animação e é o trigger principal do jogo
+      function spin() {
+        if (gameState.attemptsLeft <= 0) return;
+
+        spinBtn.disabled = true;
+        messageDiv.className = 'message';
+        messageDiv.textContent = '';
+
+        gameState.attemptsLeft--;
+        remainingAttempts.textContent = gameState.attemptsLeft;
+
+        // Tocar som de giro
+        spinSound.currentTime = 0;
+        spinSound.play();
+
+        let step = 0;
+        let animationSymbols = [];
+
+        // Gerar sequência de símbolos para animação e resultado final
+        function generateSpinSymbols() {
+          const sequence = [];
+          for (let i = 0; i < SPIN_ANIMATION_STEPS; i++) {
+            sequence.push(shuffleSymbols());
+          }
+          return sequence;
+        }
+
+        // Embaralha símbolo aleatório para animação
+        function shuffleSymbols() {
+          return [
+            symbols[Math.floor(Math.random() * symbols.length)],
+            symbols[Math.floor(Math.random() * symbols.length)],
+            symbols[Math.floor(Math.random() * symbols.length)]
+          ];
+        }
+
+        animationSymbols = generateSpinSymbols();
+
+        const spinInterval = setInterval(() => {
+          if (step === SPIN_ANIMATION_STEPS) {
+            clearInterval(spinInterval);
+
+            // Resultado final, gerado com lógica mais natural
+            const outcome = generateOutcome();
+            displaySymbols(outcome);
+
+            evaluateResult(outcome);
+
+            spinBtn.disabled = false;
+
+            if (gameState.attemptsLeft <= 0) {
+              setTimeout(endGame, 2000);
+            }
+            return;
+          }
+
+          displaySymbols(animationSymbols[step]);
+          step++;
+        }, SPIN_INTERVAL_MS);
+      }
+
+      // Gera resultado final para a rodada com probabilidades ajustadas
+      function generateOutcome() {
+        const chance = Math.random();
+        
+        // 5% de chance de jackpot (três 7)
+        if (chance < 0.05) {
+          return ['7', '7', '7'];
+        } 
+        // 10% de chance de três iguais (exceto 7)
+        else if (chance < 0.15) {
+          const filteredSymbols = symbols.filter(s => s !== '7');
+          const randomSymbol = filteredSymbols[Math.floor(Math.random() * filteredSymbols.length)];
+          return [randomSymbol, randomSymbol, randomSymbol];
+        } 
+        // 30% de chance de dois iguais
+        else if (chance < 0.45) {
+          const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+          let outcome = [randomSymbol, randomSymbol];
+          // Adiciona um símbolo diferente
+          let differentSymbol;
+          do {
+            differentSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+          } while (differentSymbol === randomSymbol);
+          outcome.push(differentSymbol);
+          // Embaralha a ordem
+          return shuffleArray(outcome);
+        } 
+        // 55% de chance de todos diferentes
+        else {
+          return shuffleArray([...symbols]).slice(0, 3);
+        }
+      }
+
+      // Exibe símbolos nos rolos, animando vitória se aplicável
+      function displaySymbols(symbolArray, isWin = false) {
+        reels.forEach((reel, i) => {
+          reel.textContent = symbolArray[i];
+          if (isWin) {
+            reel.classList.add('win');
+            // Remover após animação
+            setTimeout(() => reel.classList.remove('win'), 2100);
+          }
+        });
+      }
+
+      // Avalia o resultado da rodada e atualiza pontuação
+      function evaluateResult(outcome) {
+        const [a, b, c] = outcome;
+        
+        // Jackpot - três 7
+        if (a === '7' && b === '7' && c === '7') {
+          const points = winMultipliers['7'] * 10; // Bônus extra para jackpot
+          gameState.score += points;
+          gameState.stats.jackpots++;
+          currentScore.textContent = gameState.score;
+          jackpotCount.textContent = gameState.stats.jackpots;
+          messageDiv.textContent = `JACKPOT! +${points} FICHAS!`;
+          messageDiv.classList.add('jackpot');
+          displaySymbols(outcome, true);
+          
+          // Tocar som de jackpot
+          jackpotSound.currentTime = 0;
+          jackpotSound.play();
+          return;
+        }
+        
+        // Três símbolos iguais
+        if (a === b && b === c) {
+          const points = winMultipliers[a] * 3;
+          gameState.score += points;
+          gameState.stats.wins++;
+          currentScore.textContent = gameState.score;
+          winCount.textContent = gameState.stats.wins;
+          messageDiv.textContent = `3x ${a}! +${points} FICHAS!`;
+          displaySymbols(outcome, true);
+          
+          // Tocar som de vitória
+          winSound.currentTime = 0;
+          winSound.play();
+          return;
+        }
+        
+        // Dois símbolos iguais
+        if (a === b || a === c || b === c) {
+          const matchedSymbol = a === b ? a : c;
+          const points = winMultipliers[matchedSymbol];
+          gameState.score += points;
+          currentScore.textContent = gameState.score;
+          messageDiv.textContent = `2x ${matchedSymbol}! +${points} FICHAS!`;
+          displaySymbols(outcome, true);
+          
+          // Tocar som de vitória menor
+          winSound.currentTime = 0.3;
+          winSound.volume = 0.6;
+          winSound.play();
+          return;
+        }
+        
+        // Sem vitória
+        messageDiv.textContent = 'Tente novamente!';
+      }
+
+      // Função utilitária para embaralhar array
+      function shuffleArray(array) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+      }
+
+      // Inicializa o jogo quando o DOM estiver pronto
+      document.addEventListener('DOMContentLoaded', initGame);
+    })();
+  </script>
+</body>
+</html>
