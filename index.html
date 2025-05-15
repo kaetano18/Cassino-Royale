@@ -540,6 +540,13 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 0 #8a6d0b, 0 0 25px rgba(229, 184, 11, 0.9);
     }
+    .game-over-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 300px;
+    }
     .chips-decoration {
       position: absolute;
       width: 60px;
@@ -650,8 +657,11 @@
       <h2 class="game-over-title">FIM DO JOGO</h2>
       <div class="final-score">Suas fichas: <span id="finalScoreValue">0</span></div>
       <div class="final-message" id="finalMessage"></div>
-      <button class="restart-btn" id="restartGameBtn">Jogar Novamente</button>
-      <button class="view-ranking-btn" id="viewRankingFinalBtn">Ver Ranking</button>
+      <div class="game-over-buttons">
+        <button class="restart-btn" id="restartGameBtn">Jogar Novamente</button>
+        <button class="view-ranking-btn" id="viewRankingFinalBtn">Ver Ranking</button>
+        <button class="feedback-btn" id="feedbackFinalBtn">Deixar Feedback</button>
+      </div>
     </section>
   </main>
 
@@ -690,6 +700,7 @@
       const finalMessage = document.getElementById('finalMessage');
       const restartGameBtn = document.getElementById('restartGameBtn');
       const viewRankingFinalBtn = document.getElementById('viewRankingFinalBtn');
+      const feedbackFinalBtn = document.getElementById('feedbackFinalBtn');
 
       // Sons do jogo
       const spinSound = document.getElementById('spinSound');
@@ -730,19 +741,23 @@
         startGameBtn.addEventListener('click', startGame);
         spinBtn.addEventListener('click', spin);
         viewRankingBtn.addEventListener('click', showRanking);
-        feedbackBtn.addEventListener('click', () => {
-          window.open('https://docs.google.com/forms/d/e/1FAIpQLSehmgjSrn8PR--pnoWAPs3kcsCpFqL358vO8EwNSUMcYZPBNQ/viewform?usp=header', '_blank');
-        });
+        feedbackBtn.addEventListener('click', showFeedbackForm);
         backFromRankingBtn.addEventListener('click', hideRanking);
         resetRankingBtn.addEventListener('click', resetRanking);
         restartGameBtn.addEventListener('click', restartGame);
         viewRankingFinalBtn.addEventListener('click', showRanking);
+        feedbackFinalBtn.addEventListener('click', showFeedbackForm);
 
         playerNameInput.addEventListener('keypress', (e) => {
           if (e.key === 'Enter') startGame();
         });
       }
       
+      // Mostra formulário de feedback
+      function showFeedbackForm() {
+        window.open('https://docs.google.com/forms/d/e/1FAIpQLSehmgjSrn8PR--pnoWAPs3kcsCpFqL358vO8EwNSUMcYZPBNQ/viewform?usp=header', '_blank');
+      }
+
       // Carrega o ranking do localStorage
       function loadRanking() {
         const savedRanking = localStorage.getItem('casinoRanking');
@@ -855,14 +870,15 @@
         const existing = gameState.ranking.findIndex(p => p.name.toLowerCase() === lowerName);
         
         if (existing !== -1) {
-          if (score > gameState.ranking[existing].score) {
-            gameState.ranking[existing].score = score;
-          }
+          gameState.ranking[existing].score = score;
         } else {
           gameState.ranking.push({ name, score });
         }
         
+        // Sort by score descending
         gameState.ranking.sort((a, b) => b.score - a.score);
+        
+        // Keep only top players
         if (gameState.ranking.length > MAX_PLAYERS_IN_RANKING) {
           gameState.ranking = gameState.ranking.slice(0, MAX_PLAYERS_IN_RANKING);
         }
@@ -871,208 +887,152 @@
         updateRankingDisplay();
       }
 
-      function restartGame() {
-        gameOverContainer.style.display = 'none';
-        rankingContainer.style.display = 'none';
-        loginContainer.style.display = 'flex';
-        playerNameInput.value = gameState.playerName;
-        playerNameInput.focus();
-      }
-
-      function showRanking() {
-        loginContainer.style.display = 'none';
-        gameContainer.style.display = 'none';
-        gameOverContainer.style.display = 'none';
-        rankingContainer.style.display = 'block';
-        backFromRankingBtn.focus();
-      }
-
-      function hideRanking() {
-        rankingContainer.style.display = 'none';
-        if (gameState.attemptsLeft > 0) {
-          gameContainer.style.display = 'flex';
-          spinBtn.focus();
-        } else {
-          gameOverContainer.style.display = 'flex';
-          restartGameBtn.focus();
-        }
-      }
-
-      // Gira os rolos com animação e é o trigger principal do jogo
+      // Gira os rolos da slot machine
       function spin() {
-        if (gameState.attemptsLeft <= 0) return;
+        if (gameState.attemptsLeft <= 0) {
+          endGame();
+          return;
+        }
 
         spinBtn.disabled = true;
-        messageDiv.className = 'message';
-        messageDiv.textContent = '';
-
         gameState.attemptsLeft--;
         remainingAttempts.textContent = gameState.attemptsLeft;
+        messageDiv.textContent = '';
+        messageDiv.className = 'message';
 
-        // Tocar som de giro
+        // Play spin sound
         spinSound.currentTime = 0;
         spinSound.play();
 
-        let step = 0;
-        let animationSymbols = [];
+        // Animate each reel
+        const results = [];
+        const spinPromises = reels.map((reel, index) => {
+          return new Promise(resolve => {
+            let spinCount = 0;
+            
+            const spinInterval = setInterval(() => {
+              // Random symbol during spin animation
+              reel.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+              
+              if (++spinCount >= SPIN_ANIMATION_STEPS) {
+                clearInterval(spinInterval);
+                // Final symbol
+                const result = symbols[Math.floor(Math.random() * symbols.length)];
+                reel.textContent = result;
+                results[index] = result;
+                
+                // Add win animation class if last reel
+                if (index === reels.length - 1) {
+                  checkWin(results);
+                }
+                
+                resolve();
+              }
+            }, SPIN_INTERVAL_MS);
+          });
+        });
 
-        // Gerar sequência de símbolos para animação e resultado final
-        function generateSpinSymbols() {
-          const sequence = [];
-          for (let i = 0; i < SPIN_ANIMATION_STEPS; i++) {
-            sequence.push(shuffleSymbols());
-          }
-          return sequence;
-        }
-
-        // Embaralha símbolo aleatório para animação
-        function shuffleSymbols() {
-          return [
-            symbols[Math.floor(Math.random() * symbols.length)],
-            symbols[Math.floor(Math.random() * symbols.length)],
-            symbols[Math.floor(Math.random() * symbols.length)]
-          ];
-        }
-
-        animationSymbols = generateSpinSymbols();
-
-        const spinInterval = setInterval(() => {
-          if (step === SPIN_ANIMATION_STEPS) {
-            clearInterval(spinInterval);
-
-            // Resultado final, gerado com lógica mais natural
-            const outcome = generateOutcome();
-            displaySymbols(outcome);
-
-            evaluateResult(outcome);
-
-            spinBtn.disabled = false;
-
-            if (gameState.attemptsLeft <= 0) {
-              setTimeout(endGame, 2000);
-            }
-            return;
-          }
-
-          displaySymbols(animationSymbols[step]);
-          step++;
-        }, SPIN_INTERVAL_MS);
-      }
-
-      // Gera resultado final para a rodada com probabilidades ajustadas
-      function generateOutcome() {
-        const chance = Math.random();
-        
-        // 5% de chance de jackpot (três 7)
-        if (chance < 0.05) {
-          return ['7', '7', '7'];
-        } 
-        // 10% de chance de três iguais (exceto 7)
-        else if (chance < 0.15) {
-          const filteredSymbols = symbols.filter(s => s !== '7');
-          const randomSymbol = filteredSymbols[Math.floor(Math.random() * filteredSymbols.length)];
-          return [randomSymbol, randomSymbol, randomSymbol];
-        } 
-        // 30% de chance de dois iguais
-        else if (chance < 0.45) {
-          const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-          let outcome = [randomSymbol, randomSymbol];
-          // Adiciona um símbolo diferente
-          let differentSymbol;
-          do {
-            differentSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-          } while (differentSymbol === randomSymbol);
-          outcome.push(differentSymbol);
-          // Embaralha a ordem
-          return shuffleArray(outcome);
-        } 
-        // 55% de chance de todos diferentes
-        else {
-          return shuffleArray([...symbols]).slice(0, 3);
-        }
-      }
-
-      // Exibe símbolos nos rolos, animando vitória se aplicável
-      function displaySymbols(symbolArray, isWin = false) {
-        reels.forEach((reel, i) => {
-          reel.textContent = symbolArray[i];
-          if (isWin) {
-            reel.classList.add('win');
-            // Remover após animação
-            setTimeout(() => reel.classList.remove('win'), 2100);
+        Promise.all(spinPromises).then(() => {
+          spinBtn.disabled = gameState.attemptsLeft <= 0;
+          if (gameState.attemptsLeft <= 0) {
+            setTimeout(endGame, 1000);
           }
         });
       }
 
-      // Avalia o resultado da rodada e atualiza pontuação
-      function evaluateResult(outcome) {
-        const [a, b, c] = outcome;
+      // Verifica se houve vitória e calcula prêmio
+      function checkWin(results) {
+        // Remove win classes if any
+        reels.forEach(reel => reel.classList.remove('win'));
         
-        // Jackpot - três 7
-        if (a === '7' && b === '7' && c === '7') {
-          const points = winMultipliers['7'] * 10; // Bônus extra para jackpot
-          gameState.score += points;
-          gameState.stats.jackpots++;
-          currentScore.textContent = gameState.score;
-          jackpotCount.textContent = gameState.stats.jackpots;
-          messageDiv.textContent = `JACKPOT! +${points} FICHAS!`;
-          messageDiv.classList.add('jackpot');
-          displaySymbols(outcome, true);
+        // All symbols match = jackpot
+        if (results[0] === results[1] && results[1] === results[2]) {
+          const multiplier = winMultipliers[results[0]];
+          const winAmount = multiplier * 5; // Jackpot bonus
           
-          // Tocar som de jackpot
-          jackpotSound.currentTime = 0;
-          jackpotSound.play();
+          gameState.score += winAmount;
+          currentScore.textContent = gameState.score;
+          
+          if (results[0] === '7') {
+            // Mega jackpot
+            messageDiv.textContent = `🎉 JACKPOT! +${winAmount} FICHAS! 🎉`;
+            messageDiv.classList.add('jackpot');
+            gameState.stats.jackpots++;
+            jackpotCount.textContent = gameState.stats.jackpots;
+            
+            jackpotSound.currentTime = 0;
+            jackpotSound.play();
+          } else {
+            // Regular win
+            messageDiv.textContent = `🎉 TRÊS ${results[0]}! +${winAmount} FICHAS! 🎉`;
+            messageDiv.classList.add('jackpot');
+            gameState.stats.wins++;
+            winCount.textContent = gameState.stats.wins;
+            
+            winSound.currentTime = 0;
+            winSound.play();
+          }
+          
+          // Animate all reels
+          reels.forEach(reel => reel.classList.add('win'));
           return;
         }
         
-        // Três símbolos iguais
-        if (a === b && b === c) {
-          const points = winMultipliers[a] * 3;
-          gameState.score += points;
-          gameState.stats.wins++;
-          currentScore.textContent = gameState.score;
-          winCount.textContent = gameState.stats.wins;
-          messageDiv.textContent = `3x ${a}! +${points} FICHAS!`;
-          displaySymbols(outcome, true);
+        // Two matching symbols = small win
+        if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+          let matchingSymbol = results[0] === results[1] ? results[0] : results[2];
+          const winAmount = winMultipliers[matchingSymbol];
           
-          // Tocar som de vitória
+          gameState.score += winAmount;
+          currentScore.textContent = gameState.score;
+          messageDiv.textContent = `👍 DOIS ${matchingSymbol}! +${winAmount} FICHAS!`;
+          gameState.stats.wins++;
+          winCount.textContent = gameState.stats.wins;
+          
+          // Animate matching reels
+          if (results[0] === results[1]) {
+            reels[0].classList.add('win');
+            reels[1].classList.add('win');
+          } else {
+            reels[1].classList.add('win');
+            reels[2].classList.add('win');
+          }
+          
           winSound.currentTime = 0;
           winSound.play();
           return;
         }
         
-        // Dois símbolos iguais
-        if (a === b || a === c || b === c) {
-          const matchedSymbol = a === b ? a : c;
-          const points = winMultipliers[matchedSymbol];
-          gameState.score += points;
-          currentScore.textContent = gameState.score;
-          messageDiv.textContent = `2x ${matchedSymbol}! +${points} FICHAS!`;
-          displaySymbols(outcome, true);
-          
-          // Tocar som de vitória menor
-          winSound.currentTime = 0.3;
-          winSound.volume = 0.6;
-          winSound.play();
-          return;
-        }
-        
-        // Sem vitória
-        messageDiv.textContent = 'Tente novamente!';
+        // No win
+        messageDiv.textContent = 'Sem sorte desta vez... Tente novamente!';
       }
 
-      // Função utilitária para embaralhar array
-      function shuffleArray(array) {
-        const newArray = [...array];
-        for (let i = newArray.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-        }
-        return newArray;
+      // Mostra tela de ranking
+      function showRanking() {
+        gameContainer.style.display = 'none';
+        gameOverContainer.style.display = 'none';
+        rankingContainer.style.display = 'block';
       }
 
-      // Inicializa o jogo quando o DOM estiver pronto
-      document.addEventListener('DOMContentLoaded', initGame);
+      // Esconde tela de ranking
+      function hideRanking() {
+        rankingContainer.style.display = 'none';
+        if (gameState.attemptsLeft > 0) {
+          gameContainer.style.display = 'flex';
+        } else {
+          gameOverContainer.style.display = 'flex';
+        }
+      }
+
+      // Reinicia o jogo
+      function restartGame() {
+        gameOverContainer.style.display = 'none';
+        loginContainer.style.display = 'block';
+        playerNameInput.focus();
+      }
+
+      // Inicializa o jogo quando a página carrega
+      window.addEventListener('DOMContentLoaded', initGame);
     })();
   </script>
 </body>
