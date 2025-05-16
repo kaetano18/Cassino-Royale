@@ -7,8 +7,7 @@
   <meta name="description" content="Jogo de slot machine profissional com temática de cassino">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://docs.google.com/forms/d/1FCWzWQm73cP9X9IW8HXNwTJos9coq-6wbnWDOATYpzg/edit
-" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
       --primary-color: #e5b80b;
@@ -24,11 +23,91 @@
       --font-title: 'Playfair Display', serif;
       --font-body: 'Montserrat', sans-serif;
     }
+    
+    /* Efeitos visuais */
+    @keyframes goldPulse {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+    
+    @keyframes reelWin {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    .gold-particle {
+      position: absolute;
+      background: var(--primary-color);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10;
+      animation: float 3s ease-out forwards;
+    }
+    
+    @keyframes float {
+      to {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    .login-container {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .login-container::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, transparent 0%, rgba(229, 184, 11, 0.1) 100%);
+      pointer-events: none;
+    }
+    
+    .jackpot-effect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(229, 184, 11, 0.3) 0%, transparent 70%);
+      z-index: 20;
+      display: none;
+      pointer-events: none;
+    }
+    
+    @keyframes shine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    @keyframes winGlow {
+      0% { text-shadow: 2px 2px 4px #000, 0 0 15px var(--primary-color); }
+      100% { text-shadow: 2px 2px 4px #000, 0 0 30px var(--primary-color), 0 0 45px #fff; }
+    }
+    
+    @keyframes jackpotGlow {
+      0% { box-shadow: 0 0 10px rgba(229, 184, 11, 0.7); }
+      100% { box-shadow: 0 0 30px rgba(229, 184, 11, 0.9); }
+    }
+    
+    @keyframes jackpotMessage {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
+    }
+    
+    /* Estilos principais */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+    
     body {
       background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%), 
                   url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?q=80&w=1000') center/cover no-repeat fixed;
@@ -42,12 +121,14 @@
       overflow-x: hidden;
       user-select: none;
     }
+    
     .header {
       text-align: center;
       margin-bottom: 2rem;
       width: 100%;
       position: relative;
     }
+    
     h1 {
       font-family: var(--font-title);
       font-weight: 900;
@@ -60,6 +141,7 @@
       position: relative;
       z-index: 2;
     }
+    
     h1::after {
       content: "";
       display: block;
@@ -69,6 +151,7 @@
       margin: 0.5rem auto;
       box-shadow: 0 0 8px var(--primary-color);
     }
+    
     .subtitle {
       color: rgba(240, 230, 210, 0.8);
       font-size: 1.1rem;
@@ -76,6 +159,7 @@
       font-weight: 600;
       text-transform: uppercase;
     }
+    
     .login-container {
       background: rgba(10, 5, 2, 0.9);
       padding: 2.5rem 2rem;
@@ -92,6 +176,7 @@
       position: relative;
       overflow: hidden;
     }
+    
     .login-container::before {
       content: "";
       position: absolute;
@@ -102,10 +187,7 @@
       background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
       animation: shine 3s infinite;
     }
-    @keyframes shine {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
+    
     .login-title {
       font-family: var(--font-title);
       font-size: 1.8rem;
@@ -113,6 +195,7 @@
       margin-bottom: 1rem;
       text-shadow: 1px 1px 2px #000;
     }
+    
     label.login-label {
       font-size: 1rem;
       color: var(--primary-color);
@@ -122,6 +205,7 @@
       text-align: center;
       letter-spacing: 0.05em;
     }
+    
     .login-input {
       background: rgba(0, 0, 0, 0.5);
       border: 1px solid var(--primary-color);
@@ -134,14 +218,17 @@
       text-align: center;
       transition: all 0.3s ease;
     }
+    
     .login-input::placeholder {
       color: rgba(229, 184, 11, 0.6);
     }
+    
     .login-input:focus {
       outline: none;
       box-shadow: 0 0 10px var(--primary-color);
       border-color: var(--primary-dark);
     }
+    
     .login-button {
       background: linear-gradient(to bottom, var(--primary-color), var(--primary-dark));
       border: none;
@@ -158,14 +245,17 @@
       position: relative;
       overflow: hidden;
     }
+    
     .login-button:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 6px 0 #8a6d0b, 0 0 20px rgba(229, 184, 11, 0.8);
     }
+    
     .login-button:active:not(:disabled) {
       transform: translateY(1px);
       box-shadow: 0 2px 0 #8a6d0b, 0 0 15px rgba(229, 184, 11, 0.6);
     }
+    
     .game-container {
       display: none;
       flex-direction: column;
@@ -173,6 +263,7 @@
       width: 100%;
       max-width: 900px;
     }
+    
     .player-info {
       display: flex;
       justify-content: space-between;
@@ -186,14 +277,17 @@
       border-radius: 5px;
       border: 1px solid var(--primary-color);
     }
+    
     .player-name {
       font-weight: 700;
       color: #f0e6d2;
     }
+    
     .attempts {
       color: var(--secondary-color);
       font-weight: 700;
     }
+    
     .slot-machine {
       width: 100%;
       background: rgba(20, 10, 5, 0.9);
@@ -207,6 +301,7 @@
       position: relative;
       margin-bottom: 2rem;
     }
+    
     .reel-container {
       position: relative;
       width: clamp(100px, 22vw, 150px);
@@ -221,6 +316,7 @@
       align-items: center;
       overflow: hidden;
     }
+    
     .reel-container::before {
       content: "";
       position: absolute;
@@ -237,6 +333,7 @@
       );
       pointer-events: none;
     }
+    
     .reel {
       font-size: clamp(3rem, 8vw, 5rem);
       color: var(--primary-color);
@@ -247,13 +344,11 @@
       transition: transform 0.4s ease;
       z-index: 2;
     }
+    
     .reel.win {
-      animation: winGlow 0.7s ease-in-out 3 alternate;
+      animation: winGlow 0.7s ease-in-out 3 alternate, reelWin 0.5s ease-in-out 3;
     }
-    @keyframes winGlow {
-      0% { text-shadow: 2px 2px 4px #000, 0 0 15px var(--primary-color); }
-      100% { text-shadow: 2px 2px 4px #000, 0 0 30px var(--primary-color), 0 0 45px #fff; }
-    }
+    
     .controls {
       display: flex;
       flex-direction: column;
@@ -262,6 +357,7 @@
       margin-top: 1.5rem;
       gap: 1.5rem;
     }
+    
     button {
       background: linear-gradient(to bottom, var(--primary-color), var(--primary-dark));
       border: none;
@@ -277,14 +373,17 @@
       letter-spacing: 0.1em;
       position: relative;
     }
+    
     button:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 6px 0 #8a6d0b, 0 0 25px rgba(229, 184, 11, 0.9);
     }
+    
     button:active:not(:disabled) {
       transform: translateY(1px);
       box-shadow: 0 2px 0 #8a6d0b, 0 0 20px rgba(229, 184, 11, 0.7);
     }
+    
     .message {
       margin-top: 1rem;
       font-size: 1.4rem;
@@ -299,6 +398,7 @@
       border: 1px solid var(--primary-color);
       max-width: 90%;
     }
+    
     .message.jackpot {
       color: #fff;
       background: linear-gradient(to right, #e5b80b, #f8d84e, #e5b80b);
@@ -307,10 +407,7 @@
       text-shadow: none;
       animation: jackpotGlow 0.5s infinite alternate;
     }
-    @keyframes jackpotGlow {
-      0% { box-shadow: 0 0 10px rgba(229, 184, 11, 0.7); }
-      100% { box-shadow: 0 0 30px rgba(229, 184, 11, 0.9); }
-    }
+    
     .stats {
       display: flex;
       justify-content: space-between;
@@ -318,6 +415,7 @@
       margin-top: 2rem;
       gap: 1rem;
     }
+    
     .stat-box {
       background: rgba(0, 0, 0, 0.6);
       border: 1px solid var(--primary-color);
@@ -327,6 +425,7 @@
       flex: 1;
       box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
     }
+    
     .stat-box div:first-child {
       font-size: 0.9rem;
       margin-bottom: 0.5rem;
@@ -335,11 +434,13 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
+    
     .stat-value {
       color: #f0e6d2;
       font-weight: 900;
       font-size: 1.8rem;
     }
+    
     .ranking-container {
       display: none;
       background: rgba(20, 10, 5, 0.95);
@@ -352,6 +453,7 @@
       margin: 2rem auto;
       text-align: center;
     }
+    
     .ranking-title {
       font-family: var(--font-title);
       font-size: 2rem;
@@ -360,6 +462,7 @@
       text-shadow: 1px 1px 2px #000;
       position: relative;
     }
+    
     .ranking-title::after {
       content: "";
       display: block;
@@ -368,6 +471,7 @@
       background: var(--primary-color);
       margin: 0.5rem auto;
     }
+    
     .ranking-list {
       list-style: none;
       margin: 1.5rem 0;
@@ -377,13 +481,16 @@
       border-top: 1px solid rgba(229, 184, 11, 0.3);
       border-bottom: 1px solid rgba(229, 184, 11, 0.3);
     }
+    
     .ranking-list::-webkit-scrollbar {
       width: 6px;
     }
+    
     .ranking-list::-webkit-scrollbar-thumb {
       background-color: var(--primary-color);
       border-radius: 3px;
     }
+    
     .ranking-item {
       display: flex;
       justify-content: space-between;
@@ -392,35 +499,42 @@
       font-size: 1.1rem;
       transition: all 0.3s ease;
     }
+    
     .ranking-item:hover {
       background: rgba(229, 184, 11, 0.1);
     }
+    
     .ranking-item:first-child {
       color: var(--primary-color);
       font-weight: 900;
       font-size: 1.3rem;
       background: rgba(229, 184, 11, 0.05);
     }
+    
     .ranking-item:nth-child(2) {
       color: #c0c0c0;
       font-weight: 800;
       font-size: 1.2rem;
     }
+    
     .ranking-item:nth-child(3) {
       color: #cd7f32;
       font-weight: 800;
       font-size: 1.2rem;
     }
+    
     .ranking-player {
       text-align: left;
       flex: 1;
     }
+    
     .ranking-score {
       text-align: right;
       font-weight: 900;
       min-width: 60px;
       color: var(--primary-color);
     }
+    
     .view-ranking-btn {
       margin-top: 1.5rem;
       background: transparent;
@@ -435,10 +549,12 @@
       text-transform: uppercase;
       font-weight: 600;
     }
+    
     .view-ranking-btn:hover {
       background: rgba(229, 184, 11, 0.1);
       box-shadow: 0 0 15px rgba(229, 184, 11, 0.3);
     }
+    
     .reset-ranking-btn {
       background: transparent;
       border: 1px solid var(--secondary-color);
@@ -453,10 +569,12 @@
       font-weight: 600;
       margin: 1rem 0;
     }
+    
     .reset-ranking-btn:hover {
       background: rgba(200, 0, 0, 0.1);
       box-shadow: 0 0 15px rgba(200, 0, 0, 0.3);
     }
+    
     .feedback-btn {
       margin-top: 1rem;
       background: transparent;
@@ -471,10 +589,12 @@
       text-transform: uppercase;
       font-weight: 600;
     }
+    
     .feedback-btn:hover {
       background: rgba(229, 184, 11, 0.1);
       box-shadow: 0 0 10px rgba(229, 184, 11, 0.3);
     }
+    
     .game-over {
       display: none;
       flex-direction: column;
@@ -490,6 +610,7 @@
       text-align: center;
       gap: 2rem;
     }
+    
     .game-over-title {
       font-family: var(--font-title);
       font-size: 2.5rem;
@@ -497,16 +618,19 @@
       font-weight: 900;
       text-shadow: 1px 1px 2px #000;
     }
+    
     .final-score {
       font-size: 1.5rem;
       color: #f0e6d2;
       font-weight: 600;
     }
+    
     .final-score span {
       color: var(--primary-color);
       font-weight: 900;
       font-size: 2.5rem;
     }
+    
     .final-message {
       font-size: 1.5rem;
       font-weight: 700;
@@ -517,13 +641,11 @@
       border-radius: 5px;
       border: 1px solid var(--primary-color);
     }
+    
     .final-message.jackpot {
       animation: jackpotMessage 1s infinite alternate;
     }
-    @keyframes jackpotMessage {
-      0% { transform: scale(1); }
-      100% { transform: scale(1.05); }
-    }
+    
     .restart-btn {
       background: linear-gradient(to bottom, var(--primary-color), var(--primary-dark));
       border: none;
@@ -537,10 +659,12 @@
       box-shadow: 0 4px 0 #8a6d0b, 0 0 20px rgba(229, 184, 11, 0.7);
       text-transform: uppercase;
     }
+    
     .restart-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 0 #8a6d0b, 0 0 25px rgba(229, 184, 11, 0.9);
     }
+    
     .game-over-buttons {
       display: flex;
       flex-direction: column;
@@ -548,6 +672,7 @@
       width: 100%;
       max-width: 300px;
     }
+    
     .chips-decoration {
       position: absolute;
       width: 60px;
@@ -555,32 +680,39 @@
       opacity: 0.8;
       z-index: 1;
     }
+    
     .chip-1 {
       top: 10px;
       left: 10px;
       transform: rotate(-15deg);
     }
+    
     .chip-2 {
       bottom: 10px;
       right: 10px;
       transform: rotate(15deg);
     }
+    
     @media (max-width: 768px) {
       .slot-machine {
         padding: 1.5rem;
         gap: 1rem;
       }
+      
       .reel-container {
         width: clamp(80px, 25vw, 120px);
         height: clamp(80px, 25vw, 120px);
       }
+      
       .stats {
         flex-direction: column;
       }
+      
       button {
         padding: 1rem 2rem;
         font-size: 1.2rem;
       }
+      
       .feedback-btn {
         padding: 0.5rem 1rem;
         font-size: 0.8rem;
@@ -589,6 +721,8 @@
   </style>
 </head>
 <body>
+  <div class="jackpot-effect" id="jackpotEffect"></div>
+  
   <main role="main" aria-label="Jogo de Cassino Royale Slot Machine" style="width: 100%; max-width: 900px;">
     <header class="header">
       <h1>Cassino Royale</h1>
@@ -646,9 +780,7 @@
     <!-- Tela de Ranking -->
     <section class="ranking-container" id="rankingContainer">
       <h2 class="ranking-title">TOP 10 JOGADORES</h2>
-      <ul class="ranking-list" id="rankingList">
-        <!-- Ranking será preenchido pelo JavaScript -->
-      </ul>
+      <ul class="ranking-list" id="rankingList"></ul>
       <button class="reset-ranking-btn" id="resetRankingBtn">Resetar Ranking</button>
       <button class="view-ranking-btn" id="backFromRankingBtn">Voltar</button>
     </section>
@@ -677,6 +809,7 @@
       const gameContainer = document.getElementById('gameContainer');
       const rankingContainer = document.getElementById('rankingContainer');
       const gameOverContainer = document.getElementById('gameOverContainer');
+      const jackpotEffect = document.getElementById('jackpotEffect');
       
       const playerNameInput = document.getElementById('playerNameInput');
       const startGameBtn = document.getElementById('startGameBtn');
@@ -716,7 +849,7 @@
         '🍇': 5,
         '💎': 10,
         '💰': 15,
-        '7': 50 // Jackpot
+        '7': 50
       };
       const MAX_ATTEMPTS = 10;
       const MAX_PLAYERS_IN_RANKING = 10;
@@ -735,7 +868,243 @@
         ranking: []
       };
 
-      // Inicializa o jogo e configura eventos
+      // Funções de efeitos visuais
+      function createGoldParticles(x, y, count = 20) {
+        for (let i = 0; i < count; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'gold-particle';
+          
+          const size = Math.random() * 10 + 5;
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          particle.style.left = `${x}px`;
+          particle.style.top = `${y}px`;
+          
+          const opacity = Math.random() * 0.5 + 0.5;
+          particle.style.backgroundColor = `rgba(229, 184, 11, ${opacity})`;
+          
+          const duration = Math.random() * 2 + 1;
+          particle.style.animationDuration = `${duration}s`;
+          
+          document.body.appendChild(particle);
+          
+          setTimeout(() => {
+            particle.remove();
+          }, duration * 1000);
+        }
+      }
+
+      function showJackpotEffect() {
+        jackpotEffect.style.display = 'block';
+        setTimeout(() => {
+          jackpotEffect.style.display = 'none';
+        }, 2000);
+      }
+
+      // Funções principais do jogo
+      function startGame() {
+        gameState.playerName = playerNameInput.value.trim() || 'Jogador';
+        gameState.attemptsLeft = MAX_ATTEMPTS;
+        gameState.score = 0;
+        gameState.stats = { jackpots: 0, wins: 0 };
+        
+        currentPlayerName.textContent = gameState.playerName;
+        remainingAttempts.textContent = gameState.attemptsLeft;
+        currentScore.textContent = gameState.score;
+        jackpotCount.textContent = gameState.stats.jackpots;
+        winCount.textContent = gameState.stats.wins;
+        
+        loginContainer.style.display = 'none';
+        gameContainer.style.display = 'flex';
+      }
+
+      function spin() {
+        if (gameState.attemptsLeft <= 0) return;
+        
+        gameState.attemptsLeft--;
+        remainingAttempts.textContent = gameState.attemptsLeft;
+        spinBtn.disabled = true;
+        
+        // Efeito de partículas
+        const rect = spinBtn.getBoundingClientRect();
+        createGoldParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+        
+        // Tocar som
+        spinSound.currentTime = 0;
+        spinSound.play();
+        
+        // Animação dos rolos
+        let completedSpins = 0;
+        const results = [];
+        
+        reels.forEach((reel, index) => {
+          let spinCount = 0;
+          const spinInterval = setInterval(() => {
+            const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+            reel.textContent = randomSymbol;
+            
+            if (spinCount++ >= SPIN_ANIMATION_STEPS) {
+              clearInterval(spinInterval);
+              const finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+              reel.textContent = finalSymbol;
+              results[index] = finalSymbol;
+              
+              if (++completedSpins === reels.length) {
+                checkResult(results);
+              }
+            }
+          }, SPIN_INTERVAL_MS);
+        });
+      }
+
+      function checkResult(results) {
+        spinBtn.disabled = gameState.attemptsLeft <= 0;
+        
+        // Verificar vitória
+        if (results[0] === results[1] && results[1] === results[2]) {
+          const multiplier = winMultipliers[results[0]] || 1;
+          const winAmount = multiplier * 10;
+          gameState.score += winAmount;
+          gameState.stats.wins++;
+          
+          // Efeitos de vitória
+          reels.forEach(reel => {
+            reel.classList.add('win');
+            setTimeout(() => reel.classList.remove('win'), 1500);
+          });
+          
+          winSound.currentTime = 0;
+          winSound.play();
+          
+          // Jackpot
+          if (results[0] === '7') {
+            gameState.stats.jackpots++;
+            jackpotSound.currentTime = 0;
+            jackpotSound.play();
+            showJackpotEffect();
+            messageDiv.textContent = `JACKPOT! +${winAmount} fichas!`;
+            messageDiv.classList.add('jackpot');
+          } else {
+            messageDiv.textContent = `Vitória! +${winAmount} fichas!`;
+            messageDiv.classList.remove('jackpot');
+          }
+        } else {
+          messageDiv.textContent = 'Tente novamente!';
+          messageDiv.classList.remove('jackpot');
+        }
+        
+        // Atualizar interface
+        currentScore.textContent = gameState.score;
+        jackpotCount.textContent = gameState.stats.jackpots;
+        winCount.textContent = gameState.stats.wins;
+        
+        // Verificar fim do jogo
+        if (gameState.attemptsLeft <= 0) {
+          setTimeout(endGame, 1000);
+        }
+      }
+
+      function endGame() {
+        gameContainer.style.display = 'none';
+        gameOverContainer.style.display = 'flex';
+        
+        finalScoreValue.textContent = gameState.score;
+        
+        // Mensagem final baseada no desempenho
+        if (gameState.stats.jackpots > 0) {
+          finalMessage.textContent = 'Incrível! Você acertou o JACKPOT!';
+          finalMessage.classList.add('jackpot');
+        } else if (gameState.score >= 200) {
+          finalMessage.textContent = 'Excelente pontuação!';
+          finalMessage.classList.remove('jackpot');
+        } else if (gameState.score >= 100) {
+          finalMessage.textContent = 'Bom trabalho!';
+          finalMessage.classList.remove('jackpot');
+        } else {
+          finalMessage.textContent = 'Melhor sorte na próxima!';
+          finalMessage.classList.remove('jackpot');
+        }
+        
+        // Salvar no ranking
+        saveToRanking();
+      }
+
+      function restartGame() {
+        gameOverContainer.style.display = 'none';
+        startGame();
+      }
+
+      // Funções de ranking
+      function loadRanking() {
+        const savedRanking = localStorage.getItem('slotRanking');
+        if (savedRanking) {
+          gameState.ranking = JSON.parse(savedRanking);
+        }
+      }
+
+      function saveToRanking() {
+        gameState.ranking.push({
+          name: gameState.playerName,
+          score: gameState.score
+        });
+        
+        gameState.ranking.sort((a, b) => b.score - a.score);
+        
+        if (gameState.ranking.length > MAX_PLAYERS_IN_RANKING) {
+          gameState.ranking = gameState.ranking.slice(0, MAX_PLAYERS_IN_RANKING);
+        }
+        
+        localStorage.setItem('slotRanking', JSON.stringify(gameState.ranking));
+      }
+
+      function showRanking() {
+        gameContainer.style.display = 'none';
+        gameOverContainer.style.display = 'none';
+        rankingContainer.style.display = 'block';
+        
+        rankingList.innerHTML = '';
+        
+        gameState.ranking.forEach((player, index) => {
+          const li = document.createElement('li');
+          li.className = 'ranking-item';
+          
+          const playerSpan = document.createElement('span');
+          playerSpan.className = 'ranking-player';
+          playerSpan.textContent = `${index + 1}. ${player.name}`;
+          
+          const scoreSpan = document.createElement('span');
+          scoreSpan.className = 'ranking-score';
+          scoreSpan.textContent = player.score;
+          
+          li.appendChild(playerSpan);
+          li.appendChild(scoreSpan);
+          rankingList.appendChild(li);
+        });
+      }
+
+      function hideRanking() {
+        rankingContainer.style.display = 'none';
+        if (gameState.attemptsLeft > 0) {
+          gameContainer.style.display = 'flex';
+        } else {
+          gameOverContainer.style.display = 'flex';
+        }
+      }
+
+      function resetRanking() {
+        if (confirm('Tem certeza que deseja resetar o ranking?')) {
+          gameState.ranking = [];
+          localStorage.removeItem('slotRanking');
+          rankingList.innerHTML = '';
+        }
+      }
+
+      // Outras funções
+      function showFeedbackForm() {
+        window.open('https://docs.google.com/forms/d/e/1FAIpQLSehmgjSrn8PR--pnoWAPs3kcsCpFqL358vO8EwNSUMcYZPBNQ/viewform?usp=header', '_blank');
+      }
+
+      // Inicialização do jogo
       function initGame() {
         loadRanking();
 
@@ -752,288 +1121,16 @@
         playerNameInput.addEventListener('keypress', (e) => {
           if (e.key === 'Enter') startGame();
         });
+        
+        // Efeito de partículas ao girar
+        spinBtn.addEventListener('click', (e) => {
+          const rect = spinBtn.getBoundingClientRect();
+          createGoldParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+        });
       }
       
-      // Mostra formulário de feedback
-      function showFeedbackForm() {
-        window.open('https://docs.google.com/forms/d/e/1FAIpQLSehmgjSrn8PR--pnoWAPs3kcsCpFqL358vO8EwNSUMcYZPBNQ/viewform?usp=header', '_blank');
-      }
-
-      // Carrega o ranking do localStorage
-      function loadRanking() {
-        const savedRanking = localStorage.getItem('casinoRanking');
-        if (savedRanking) {
-          gameState.ranking = JSON.parse(savedRanking);
-          updateRankingDisplay();
-        }
-      }
-
-      // Salva o ranking no localStorage
-      function saveRanking() {
-        localStorage.setItem('casinoRanking', JSON.stringify(gameState.ranking));
-      }
-
-      // Reseta o ranking completo
-      function resetRanking() {
-        if (confirm('Tem certeza que deseja resetar o ranking completo?\nTodos os dados serão perdidos permanentemente!')) {
-          gameState.ranking = [];
-          saveRanking();
-          updateRankingDisplay();
-          alert('Ranking resetado com sucesso!');
-        }
-      }
-
-      // Atualiza exibição do ranking
-      function updateRankingDisplay() {
-        rankingList.innerHTML = '';
-        if (gameState.ranking.length === 0) {
-          rankingList.innerHTML = '<li style="padding: 2rem; color: #666;">Nenhum jogador ainda</li>';
-          return;
-        }
-        
-        gameState.ranking.forEach((player, index) => {
-          const li = document.createElement('li');
-          li.className = 'ranking-item';
-          
-          const playerSpan = document.createElement('span');
-          playerSpan.className = 'ranking-player';
-          playerSpan.textContent = `${index + 1}. ${player.name}`;
-
-          const scoreSpan = document.createElement('span');
-          scoreSpan.className = 'ranking-score';
-          scoreSpan.textContent = player.score;
-
-          li.appendChild(playerSpan);
-          li.appendChild(scoreSpan);
-          rankingList.appendChild(li);
-        });
-      }
-
-      // Inicia o jogo após validação do nome
-      function startGame() {
-        const name = playerNameInput.value.trim();
-        if (name === '') {
-          messageDiv.textContent = 'Por favor, digite seu nome!';
-          messageDiv.style.display = 'block';
-          setTimeout(() => messageDiv.style.display = 'none', 2000);
-          playerNameInput.focus();
-          return;
-        }
-        
-        gameState.playerName = name;
-        gameState.attemptsLeft = MAX_ATTEMPTS;
-        gameState.score = 0;
-        gameState.stats = { jackpots: 0, wins: 0 };
-
-        currentPlayerName.textContent = name;
-        remainingAttempts.textContent = MAX_ATTEMPTS;
-        currentScore.textContent = '0';
-        jackpotCount.textContent = '0';
-        winCount.textContent = '0';
-        messageDiv.textContent = '';
-        messageDiv.className = 'message';
-
-        loginContainer.style.display = 'none';
-        rankingContainer.style.display = 'none';
-        gameOverContainer.style.display = 'none';
-        gameContainer.style.display = 'flex';
-        spinBtn.disabled = false;
-
-        // Tocar som de início
-        spinSound.currentTime = 0;
-        spinSound.play();
-      }
-
-      // Finaliza o jogo, atualiza ranking e mostra tela fim de jogo
-      function endGame() {
-        addToRanking(gameState.playerName, gameState.score);
-
-        finalScoreValue.textContent = gameState.score;
-        if (gameState.stats.jackpots > 0) {
-          finalMessage.textContent = '🎉 JACKPOT! VOCÊ É O REI DO CASSINO! 🎉';
-          finalMessage.classList.add('jackpot');
-        } else if (gameState.score >= 50) {
-          finalMessage.textContent = 'Ótimo resultado! Você nasceu com sorte!';
-        } else if (gameState.score >= 20) {
-          finalMessage.textContent = 'Boa tentativa! Quase um high roller!';
-        } else {
-          finalMessage.textContent = 'A sorte nem sempre está ao seu lado...';
-        }
-
-        gameContainer.style.display = 'none';
-        rankingContainer.style.display = 'none';
-        gameOverContainer.style.display = 'flex';
-      }
-
-      // Adiciona jogador e pontuação ao ranking (mantendo top 10)
-      function addToRanking(name, score) {
-        const lowerName = name.toLowerCase();
-        const existing = gameState.ranking.findIndex(p => p.name.toLowerCase() === lowerName);
-        
-        if (existing !== -1) {
-          gameState.ranking[existing].score = score;
-        } else {
-          gameState.ranking.push({ name, score });
-        }
-        
-        // Sort by score descending
-        gameState.ranking.sort((a, b) => b.score - a.score);
-        
-        // Keep only top players
-        if (gameState.ranking.length > MAX_PLAYERS_IN_RANKING) {
-          gameState.ranking = gameState.ranking.slice(0, MAX_PLAYERS_IN_RANKING);
-        }
-        
-        saveRanking();
-        updateRankingDisplay();
-      }
-
-      // Gira os rolos da slot machine
-      function spin() {
-        if (gameState.attemptsLeft <= 0) {
-          endGame();
-          return;
-        }
-
-        spinBtn.disabled = true;
-        gameState.attemptsLeft--;
-        remainingAttempts.textContent = gameState.attemptsLeft;
-        messageDiv.textContent = '';
-        messageDiv.className = 'message';
-
-        // Play spin sound
-        spinSound.currentTime = 0;
-        spinSound.play();
-
-        // Animate each reel
-        const results = [];
-        const spinPromises = reels.map((reel, index) => {
-          return new Promise(resolve => {
-            let spinCount = 0;
-            
-            const spinInterval = setInterval(() => {
-              // Random symbol during spin animation
-              reel.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-              
-              if (++spinCount >= SPIN_ANIMATION_STEPS) {
-                clearInterval(spinInterval);
-                // Final symbol
-                const result = symbols[Math.floor(Math.random() * symbols.length)];
-                reel.textContent = result;
-                results[index] = result;
-                
-                // Add win animation class if last reel
-                if (index === reels.length - 1) {
-                  checkWin(results);
-                }
-                
-                resolve();
-              }
-            }, SPIN_INTERVAL_MS);
-          });
-        });
-
-        Promise.all(spinPromises).then(() => {
-          spinBtn.disabled = gameState.attemptsLeft <= 0;
-          if (gameState.attemptsLeft <= 0) {
-            setTimeout(endGame, 1000);
-          }
-        });
-      }
-
-      // Verifica se houve vitória e calcula prêmio
-      function checkWin(results) {
-        // Remove win classes if any
-        reels.forEach(reel => reel.classList.remove('win'));
-        
-        // All symbols match = jackpot
-        if (results[0] === results[1] && results[1] === results[2]) {
-          const multiplier = winMultipliers[results[0]];
-          const winAmount = multiplier * 5; // Jackpot bonus
-          
-          gameState.score += winAmount;
-          currentScore.textContent = gameState.score;
-          
-          if (results[0] === '7') {
-            // Mega jackpot
-            messageDiv.textContent = `🎉 JACKPOT! +${winAmount} FICHAS! 🎉`;
-            messageDiv.classList.add('jackpot');
-            gameState.stats.jackpots++;
-            jackpotCount.textContent = gameState.stats.jackpots;
-            
-            jackpotSound.currentTime = 0;
-            jackpotSound.play();
-          } else {
-            // Regular win
-            messageDiv.textContent = `🎉 TRÊS ${results[0]}! +${winAmount} FICHAS! 🎉`;
-            messageDiv.classList.add('jackpot');
-            gameState.stats.wins++;
-            winCount.textContent = gameState.stats.wins;
-            
-            winSound.currentTime = 0;
-            winSound.play();
-          }
-          
-          // Animate all reels
-          reels.forEach(reel => reel.classList.add('win'));
-          return;
-        }
-        
-        // Two matching symbols = small win
-        if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
-          let matchingSymbol = results[0] === results[1] ? results[0] : results[2];
-          const winAmount = winMultipliers[matchingSymbol];
-          
-          gameState.score += winAmount;
-          currentScore.textContent = gameState.score;
-          messageDiv.textContent = `👍 DOIS ${matchingSymbol}! +${winAmount} FICHAS!`;
-          gameState.stats.wins++;
-          winCount.textContent = gameState.stats.wins;
-          
-          // Animate matching reels
-          if (results[0] === results[1]) {
-            reels[0].classList.add('win');
-            reels[1].classList.add('win');
-          } else {
-            reels[1].classList.add('win');
-            reels[2].classList.add('win');
-          }
-          
-          winSound.currentTime = 0;
-          winSound.play();
-          return;
-        }
-        
-        // No win
-        messageDiv.textContent = 'Sem sorte desta vez... Tente novamente!';
-      }
-
-      // Mostra tela de ranking
-      function showRanking() {
-        gameContainer.style.display = 'none';
-        gameOverContainer.style.display = 'none';
-        rankingContainer.style.display = 'block';
-      }
-
-      // Esconde tela de ranking
-      function hideRanking() {
-        rankingContainer.style.display = 'none';
-        if (gameState.attemptsLeft > 0) {
-          gameContainer.style.display = 'flex';
-        } else {
-          gameOverContainer.style.display = 'flex';
-        }
-      }
-
-      // Reinicia o jogo
-      function restartGame() {
-        gameOverContainer.style.display = 'none';
-        loginContainer.style.display = 'block';
-        playerNameInput.focus();
-      }
-
-      // Inicializa o jogo quando a página carrega
-      window.addEventListener('DOMContentLoaded', initGame);
+      // Inicia o jogo
+      initGame();
     })();
   </script>
 </body>
